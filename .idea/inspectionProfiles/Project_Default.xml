@@ -1,0 +1,54 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="DuplicatedCode" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <Languages>
+        <language minSize="892" name="Python" />
+      </Languages>
+    </inspection_tool>
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="false" level="WARNING" enabled_by_default="false">
+      <option name="ignoredPackages">
+        <value>
+          <list size="2">
+            <item index="0" class="java.lang.String" itemvalue="tortoise" />
+            <item index="1" class="java.lang.String" itemvalue="strawberry" />
+          </list>
+        </value>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyPep8Inspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredErrors">
+        <list>
+          <option value="E731" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="reports.models.NetworkRelationType.objects" />
+          <option value="reports.models.GroupModel.objects" />
+          <option value="reports.models.CommunicationCardModel.objects" />
+          <option value="reports.models.CompanyCardModel.objects" />
+          <option value="reports.models.PersonalCardModel.objects" />
+          <option value="reports.models.CommonCardModel.objects" />
+          <option value="accounts.models.TransactionsModel.objects" />
+          <option value="reports.models.SharedTokensModel.objects" />
+          <option value="reports.models.TagModel.objects" />
+          <option value="reports.models.AssociatedValueModel.objects" />
+          <option value="reports.models.OtherMixin.objects" />
+          <option value="reports.models.CommonCardModel.person" />
+          <option value="reports.models.CommonCardModel.company" />
+          <option value="reports.models.CommonCardModel.communication" />
+          <option value="googlemaps.client.Client.reverse_geocode" />
+          <option value="bot.db.models.AsListItemMixin.*" />
+          <option value="bot.db.models.AsListAsyncItemMixin.filter" />
+          <option value="bot.db.models.AsListAsyncItemMixin.*" />
+          <option value="bot.db.mixins.AsListAsyncItemMixin.*" />
+          <option value="bot.db.mixins.AsListItemMixin.*" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="requirements.InstalledPackageInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+  </profile>
+</component>

@@ -1,0 +1,53 @@
+version: "3.8"
+
+networks:
+  shared:
+    driver: bridge
+
+volumes:
+  pgadmin:
+
+services:
+  database:
+    image: postgres:14
+    container_name: notifier-bot-database
+    environment:
+      POSTGRES_DB: ${POSTGRES_DATABASE}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    expose:
+      - 5432
+    restart: unless-stopped
+    networks:
+      - shared
+
+  database-admin:
+    image: dpage/pgadmin4
+    container_name: notifier-bot-database-admin
+    environment:
+      PGADMIN_LISTEN_PORT: ${PGADMIN_PORT}
+      PGADMIN_DEFAULT_EMAIL: ${ADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${ADMIN_PASSWORD}
+    ports:
+      - "5050:${PGADMIN_PORT}"
+    restart: unless-stopped
+    networks:
+      - shared
+    depends_on:
+      - database
+    volumes:
+      - pgadmin:/root/.pgadmin
+
+  notifier-bot:
+    build: .
+    container_name: notifier-bot
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - shared
+    command: bash -c "bot"
+
