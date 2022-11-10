@@ -1,0 +1,9 @@
+aiogram
+aiohttp
+tortoise-orm[asyncpg]
+rich
+uvloop
+ujson
+python-rapidjson
+aerich
+validators
