@@ -52,6 +52,10 @@ async def main(delay: float):
                 await asyncio.sleep(delay)
 
 
-if __name__ == '__main__':
+def app():
     logging.basicConfig(level=logging.INFO)
     asyncio.run(main(0.1))
+
+
+if __name__ == '__main__':
+    app()

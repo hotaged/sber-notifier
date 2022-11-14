@@ -1,13 +1,15 @@
-uvloop_imported = False
+__author__ = 'Dmitriy Ezhov'
+__maintainer__ = __author__
 
-try:
-    import uvloop
-
-    uvloop_imported = True
-
-except ImportError:
-    pass
+__email__ = 'dmitriiezhow@gmail.com'
+__license__ = 'MIT'
+__version__ = '0.0.1'
 
 
-if uvloop_imported:
-    uvloop.install()
+__all__ = (
+    '__author__',
+    '__email__',
+    '__license__',
+    '__maintainer__',
+    '__version__',
+)

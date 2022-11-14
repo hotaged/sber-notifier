@@ -51,3 +51,13 @@ services:
       - shared
     command: bash -c "bot"
 
+  notifier-observer:
+    build: .
+    container_name: notifier-observer
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - shared
+    command: bash -c "observer"
+

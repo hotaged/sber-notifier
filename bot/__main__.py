@@ -21,6 +21,19 @@ async def on_shutdown(*_):
 
 
 def main(*_, **__):
+    uvloop_imported = False
+
+    try:
+        import uvloop
+
+        uvloop_imported = True
+
+    except ImportError:
+        pass
+
+    if uvloop_imported:
+        uvloop.install()
+
     executor.start_polling(
         dp,
         on_startup=on_startup,
