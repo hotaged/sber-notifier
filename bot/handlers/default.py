@@ -1,3 +1,4 @@
+from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.types import Message, CallbackQuery
 
@@ -32,9 +33,11 @@ async def any_message(message: Message):
 
 
 class AddAddressForm(StatesGroup):
-    require = State()
-    not_require = State()
-    remove = State()
+    started = State()
+
+
+class RemoveAddressForm(StatesGroup):
+    started = State()
 
 
 @dp.callback_query_handler(BaseKeyboard.query_add)
@@ -44,13 +47,12 @@ async def callback_query_add(callback_query: CallbackQuery):
         callback_query.message.chat.id,
         "Отправьте мне адрес."
     )
-    await AddAddressForm.require.set()
+    await AddAddressForm.started.set()
 
 
-@dp.message_handler(state=AddAddressForm.require)
-async def handle_address(message: Message):
+@dp.message_handler(state=AddAddressForm.started)
+async def handle_address(message: Message, state: FSMContext):
     user, _ = await TelegramUser.get_or_create(telegram_id=message.chat.id)
-    await AddAddressForm.not_require.set()
 
     address = message.text
 
@@ -85,6 +87,7 @@ async def handle_address(message: Message):
     )
 
     await any_message(message)
+    await state.finish()
 
 
 @dp.callback_query_handler(BaseKeyboard.query_delete)
@@ -94,13 +97,11 @@ async def callback_query_delete(callback_query: CallbackQuery):
         callback_query.message.chat.id,
         "Отправьте мне адрес."
     )
-    await AddAddressForm.remove.set()
+    await RemoveAddressForm.started.set()
 
 
-@dp.message_handler(state=AddAddressForm.remove)
-async def handle_delete(message: Message):
-    await AddAddressForm.not_require.set()
-
+@dp.message_handler(state=RemoveAddressForm.started)
+async def handle_delete(message: Message, state: FSMContext):
     user, _ = await TelegramUser.get_or_create(telegram_id=message.chat.id)
     address = message.get_args()
 
@@ -133,6 +134,7 @@ async def handle_delete(message: Message):
     )
 
     await any_message(message)
+    await state.finish()
 
 
 @dp.callback_query_handler(BaseKeyboard.query_list)

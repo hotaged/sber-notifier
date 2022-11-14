@@ -6,6 +6,7 @@ networks:
 
 volumes:
   pgadmin:
+  pgdata:
 
 services:
   database:
@@ -21,6 +22,8 @@ services:
     expose:
       - 5432
     restart: unless-stopped
+    volumes:
+      - pgdata:/var/lib/postgresql/data/pgdata
     networks:
       - shared
 
@@ -50,6 +53,8 @@ services:
     networks:
       - shared
     command: bash -c "bot"
+    depends_on:
+      - notifier-observer
 
   notifier-observer:
     build: .
@@ -59,5 +64,5 @@ services:
     restart: unless-stopped
     networks:
       - shared
-    command: bash -c "observer"
+    command: bash -c "aerich init -t bot.db.TORTOISE_ORM && aerich init-db && aerich upgrade && observer"
 

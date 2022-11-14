@@ -34,6 +34,8 @@ def main(*_, **__):
     if uvloop_imported:
         uvloop.install()
 
+    logging.basicConfig(level=logging.DEBUG)
+
     executor.start_polling(
         dp,
         on_startup=on_startup,

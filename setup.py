@@ -5,7 +5,7 @@ from importlib.machinery import SourceFileLoader
 from pkg_resources import parse_requirements
 from setuptools import find_packages, setup
 
-module_name = 'sber-notifier'
+module_name = 'bot'
 
 module = SourceFileLoader(
     module_name, os.path.join(module_name, '__init__.py')
