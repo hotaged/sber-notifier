@@ -176,4 +176,3 @@ async def callback_query_list_back(callback_query: CallbackQuery):
 @dp.callback_query_handler(BaseKeyboard.query_instruction)
 async def callback_query_inst(callback_query: CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
-

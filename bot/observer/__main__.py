@@ -6,6 +6,7 @@ import logging
 from bot import db, config
 from bot.handlers import bot
 from bot.db.models import SberAddress
+from aiogram.utils.markdown import link
 
 
 async def main(delay: float):
@@ -36,8 +37,11 @@ async def main(delay: float):
                 if address.last_transaction_id != transaction_id:
 
                     message_text = (
-                        f"Новая транзакция по адресу {address.address}!\n"
-                        f"{config.sber_explorer_url}/tx/{transaction_id}"
+                        f"Обнаружена транзакция!\n"
+                        f"Блокчейн: Sbercoin\n"
+                        f"Адрес: {address.address}\n"
+                        f"Сумма: {abs(json['transactions'][0]['amount'])}\n"
+                        f"{link('Смотреть в блокчейне.', f'{config.sber_explorer_url}/tx/{transaction_id}')}\n"
                     )
 
                     for user in address.users:

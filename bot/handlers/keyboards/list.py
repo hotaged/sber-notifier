@@ -6,6 +6,7 @@ from aiogram.types import (
     CallbackQuery
 )
 
+from bot import config
 from bot.utils import unique_query_id
 from bot.handlers.keyboards.base import BUTTON_LIST
 
@@ -22,7 +23,7 @@ class ListKeyboard(InlineKeyboardMarkup):
 
         for item in items[offset:offset + limit]:
             self.add(InlineKeyboardButton(
-                item[0], callback_data=f'{BUTTON_LIST_AT}.{item[1]}'
+                item[0], url=f'{config.sber_explorer_url}/address/{item[0]}'
             ))
 
         if offset < limit:
@@ -72,3 +73,7 @@ class ListKeyboard(InlineKeyboardMarkup):
     def parse_callback_query(cls, callback_query: CallbackQuery) -> typing.Tuple[int, int]:
         offset, limit = tuple(map(int, callback_query.data.split('.')[-1].split('-')))
         return offset, limit
+
+    @classmethod
+    def parse_list_index(cls, callback_query: CallbackQuery) -> int:
+        return int(callback_query.data.split('.')[-1])
