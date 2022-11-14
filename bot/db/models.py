@@ -1,6 +1,7 @@
 import aiohttp
 import ujson
 from tortoise import models, fields
+from bot.db.mixins import AsListItemMixin
 
 from bot import config
 
@@ -40,7 +41,7 @@ class TelegramUser(models.Model):
         return await self.addresses.all().values_list("address", flat=True)
 
 
-class SberAddress(models.Model):
+class SberAddress(models.Model, AsListItemMixin):
     address = fields.CharField(max_length=64, unique=True)
     last_transaction_id = fields.CharField(max_length=64, null=True)
 
