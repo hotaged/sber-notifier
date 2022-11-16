@@ -97,7 +97,7 @@ async def callback_query_delete(callback_query: CallbackQuery):
 @dp.message_handler(state=RemoveAddressForm.started)
 async def handle_delete(message: Message, state: FSMContext):
     user, _ = await TelegramUser.get_or_create(telegram_id=message.chat.id)
-    address = message.get_args()
+    address = message.text
 
     if address is None:
         return await bot.send_message(
