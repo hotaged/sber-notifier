@@ -10,14 +10,8 @@ from bot.handlers.keyboards.list import ListKeyboard
 
 
 BASE_MESSAGE_TEXT = (
-        "Команды: \n"
-        "\n"
-        "/sub <адрес>   - Подписка на уведомления о транзакциях адреса.\n"
-        "/unsub <адрес> - Отключить уведомления о транзакциях адреса.\n"
-        "/subs          - Список адресов."
-        "\n"
-        "Пример: \n"
-        "/sub Sf6tcyxRFL8LjCv3AtPZcYipAHhnPHzrTX"
+        "Отслеживайте активность интересующих вас адресов в блокчейнах Bitcoin, Ethereum, Sbercoin.com, Tron, "
+        "Dogecoin в режиме реального времени. "
     )
 
 
@@ -176,3 +170,15 @@ async def callback_query_list_back(callback_query: CallbackQuery):
 @dp.callback_query_handler(BaseKeyboard.query_instruction)
 async def callback_query_inst(callback_query: CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
+
+    await bot.send_message((
+        "Добавить адрес: \n"
+        "Чтобы добавить новый адрес для отслеживания просто вставьте адрес одного из поддерживаемых блокчейнов ("
+        "Bitcoin, Ethereum, Sbercoin.com, Tron, Dogecoin) "
+        "Удалить адрес: \n"
+        "Чтобы удалить ранее добавленный адрес из отслеживаемых"
+        "Лист адресов: \n"
+        "Список всех отслеживаемых адресов"
+    ))
+
+    await any_message(callback_query.message)
