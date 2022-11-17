@@ -1,64 +1,76 @@
 import asyncio
 import aiohttp
-import ujson
+import click
 import logging
 
-from bot import db, config
+from bot import db
+from bot import blockchain
 from bot.handlers import bot
 from bot.db.models import SberAddress
 from aiogram.utils.markdown import link
+from bot.blockchain.base import AbstractBlockchain
 
 
-async def main(delay: float):
+async def main(chain: str, delay: float):
     await db.init()
+
+    b_api: AbstractBlockchain = blockchain.choice[chain]
 
     logging.info("Initiated database.")
 
     async with aiohttp.ClientSession() as client:
+        logging.info("Started polling.")
 
         while True:
             addresses = await SberAddress.all().prefetch_related("users")
 
             for address in addresses:
-                request = f'{config.sber_explorer_api}/address/{address.address}/basic-txs?limit=1&offset=0'
-
-                async with client.get(request) as response:
-                    logging.info(f"Requesting address: {address.address}")
-
-                    json = await response.json(loads=ujson.loads)
-
-                    logging.info(f"Got response: {json}")
-
-                if not json['transactions']:
+                try:
+                    logging.info(f"Polling: {chain.capitalize()}, Address: {address.address}")
+                    row_transaction = await b_api.request_last_transaction(client, address.address)
+                except b_api.InvalidAddress:
                     continue
 
-                transaction_id = json['transactions'][0]['id']
+                transaction = b_api.parse_transaction(row_transaction)
 
-                if address.last_transaction_id != transaction_id:
+                if address.last_transaction_id != transaction.tx_hash:
 
                     message_text = (
                         f"Обнаружена транзакция!\n"
-                        f"Блокчейн: Sbercoin\n"
+                        f"Блокчейн: {transaction.blockchain}\n"
                         f"Адрес: {address.address}\n"
-                        f"Сумма: {abs(json['transactions'][0]['amount'])}\n"
-                        f"{link('Смотреть в блокчейне.', f'{config.sber_explorer_url}/tx/{transaction_id}')}\n"
+                        f"Сумма: {transaction.amount}\n"
+                        f"{link('Смотреть в блокчейне.', transaction.explorer_link)}\n"
                     )
 
+                    logging.info(f"Polling: {chain.capitalize()}, Address: {address.address} - FOUND!")
                     for user in address.users:
                         await bot.send_message(
                             user.telegram_id,
                             message_text
                         )
+                    logging.info(f"Polling: {chain.capitalize()}, Address: {address.address} - Sending complete.")
 
-                    address.last_transaction_id = transaction_id
+                    address.last_transaction_id = transaction.tx_hash
                     await address.save()
 
                 await asyncio.sleep(delay)
 
 
-def app():
+@click.command()
+@click.option(
+    '--chain',
+    type=click.Choice(list(blockchain.choice.keys()), case_sensitive=False)
+)
+@click.option(
+    '--delay',
+    type=click.FLOAT
+)
+def app(chain: str, delay: float):
     logging.basicConfig(level=logging.INFO)
-    asyncio.run(main(0.1))
+
+    logging.info(f"Loaded driver: {chain.capitalize()}")
+    asyncio.run(main(chain, delay))
 
 
 if __name__ == '__main__':

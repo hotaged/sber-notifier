@@ -52,17 +52,61 @@ services:
     restart: unless-stopped
     networks:
       - shared
-    command: bash -c "bot"
+    command: bash -c "aerich init -t bot.db.TORTOISE_ORM && aerich init-db && aerich upgrade && bot"
     depends_on:
-      - notifier-observer
+      - database
 
-  notifier-observer:
+  notifier-observer-sbercoin:
     build: .
-    container_name: notifier-observer
+    container_name: notifier-observer-sbercoin
     env_file:
       - .env
     restart: unless-stopped
     networks:
       - shared
-    command: bash -c "aerich init -t bot.db.TORTOISE_ORM && aerich init-db && aerich upgrade && observer"
+    command: bash -c "observer --chain=sbercoin --delay=0.25"
+    depends_on:
+      - database
+      - notifier-bot
+
+  notifier-observer-bitcoin:
+    build: .
+    container_name: notifier-observer-bitcoin
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - shared
+    command: bash -c "observer --chain=bitcoin --delay=0.25"
+    depends_on:
+      - database
+      - notifier-bot
+
+  notifier-observer-tron:
+    build: .
+    container_name: notifier-observer-tron
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - shared
+    command: bash -c "observer --chain=tron --delay=0.25"
+    depends_on:
+      - database
+      - notifier-bot
+
+
+  notifier-observer-ethereum:
+    build: .
+    container_name: notifier-observer-ethereum
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - shared
+    command: bash -c "observer --chain=ethereum --delay=0.1"
+    depends_on:
+      - database
+      - notifier-bot
+
 

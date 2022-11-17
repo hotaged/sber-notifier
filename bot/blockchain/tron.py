@@ -33,8 +33,25 @@ class TronBlockchain(AbstractBlockchain):
 
             json = await response.json(loads=ujson.loads)
 
-            if not json['data']:
-                raise self.InvalidAddress(f"Address has no transactions yet")
+            if 'data' not in json:
+                raise self.InvalidAddress(f"Address has no doesn't exists in Tron")
 
         return json['data'][0]
 
+
+if __name__ == '__main__':
+    import asyncio
+    import aiohttp
+
+    async def main():
+        async with aiohttp.ClientSession() as client:
+            blockchain = TronBlockchain()
+
+            try:
+                transaction = await blockchain.request_last_transaction(client, 'TKwUkxyn2GHCb2vwE4a6iGBDBwcUV1Egxc')
+            except blockchain.InvalidAddress as e:
+                return print(e.args)
+
+            print(blockchain.parse_transaction(transaction))
+
+    asyncio.run(main())

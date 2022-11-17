@@ -22,7 +22,7 @@ class EthereumBlockchain(AbstractBlockchain):
             f'{self.api_url}'
             f'?module=account'
             f'&action=txlist'
-            f'&address=0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC'
+            f'&address={address}'
             f'&page=1'
             f'&offset=1'
             f'&sort=desc'
@@ -36,10 +36,25 @@ class EthereumBlockchain(AbstractBlockchain):
 
             json = await response.json(loads=ujson.loads)
 
-            if not json['result']:
+            if json['message'] == 'NOTOK':
                 raise self.InvalidAddress(f"Address has no transactions yet")
 
         return json['result'][0]
 
 
+if __name__ == '__main__':
+    import asyncio
+    import aiohttp
 
+    async def main():
+        async with aiohttp.ClientSession() as client:
+            blockchain = EthereumBlockchain()
+
+            try:
+                transaction = await blockchain.request_last_transaction(client, 'Sf6tcyxRFL8LjCv3AtPZcYipAHhnPHzrTX')
+            except blockchain.InvalidAddress as e:
+                return print(e.args)
+
+            print(blockchain.parse_transaction(transaction))
+
+    asyncio.run(main())
