@@ -8,11 +8,10 @@ from bot.handlers.misc import dp, bot
 from bot.handlers.keyboards.base import BaseKeyboard
 from bot.handlers.keyboards.list import ListKeyboard
 
-
 BASE_MESSAGE_TEXT = (
-        "Отслеживайте активность интересующих вас адресов в блокчейнах Bitcoin, Ethereum, Sbercoin.com, Tron, "
-        "Dogecoin в режиме реального времени. "
-    )
+    "Отслеживайте активность интересующих вас адресов в блокчейнах Bitcoin, Ethereum, Sbercoin.com, Tron, "
+    "Dogecoin в режиме реального времени. "
+)
 
 
 @dp.message_handler()
@@ -176,14 +175,16 @@ async def callback_query_list_back(callback_query: CallbackQuery):
 async def callback_query_inst(callback_query: CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
 
-    await bot.send_message((
-        "Добавить адрес: \n"
-        "Чтобы добавить новый адрес для отслеживания просто вставьте адрес одного из поддерживаемых блокчейнов ("
-        "Bitcoin, Ethereum, Sbercoin.com, Tron, Dogecoin) "
-        "Удалить адрес: \n"
-        "Чтобы удалить ранее добавленный адрес из отслеживаемых"
-        "Лист адресов: \n"
-        "Список всех отслеживаемых адресов"
-    ))
+    await bot.send_message(
+        callback_query.message.chat.id,
+        (
+            "Добавить адрес: \n"
+            "Чтобы добавить новый адрес для отслеживания просто вставьте адрес одного из поддерживаемых блокчейнов ("
+            "Bitcoin, Ethereum, Sbercoin.com, Tron, Dogecoin) "
+            "Удалить адрес: \n"
+            "Чтобы удалить ранее добавленный адрес из отслеживаемых"
+            "Лист адресов: \n"
+            "Список всех отслеживаемых адресов"
+        ))
 
     await any_message(callback_query.message)
