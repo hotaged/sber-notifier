@@ -1,5 +1,6 @@
 import ujson
 
+from bot import config
 from aiohttp.client import ClientSession
 from bot.blockchain.base import AbstractBlockchain, Transaction
 
@@ -7,7 +8,7 @@ from bot.blockchain.base import AbstractBlockchain, Transaction
 class EthereumBlockchain(AbstractBlockchain):
     api_url = "https://api.etherscan.io/api"
     explorer = "https://etherscan.io"
-    api_key = "H4SUADYVE1EQCYB2DW63WNYDZ2DAT26S59"
+    api_key = config.etherscan_api_key
 
     def parse_transaction(self, transaction: dict) -> Transaction:
         return Transaction(
