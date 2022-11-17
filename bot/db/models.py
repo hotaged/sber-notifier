@@ -42,8 +42,8 @@ class TelegramUser(models.Model):
 
 
 class SberAddress(models.Model, AsListItemMixin):
-    address = fields.CharField(max_length=64, unique=True)
-    last_transaction_id = fields.CharField(max_length=64, null=True)
+    address = fields.CharField(max_length=256, unique=True)
+    last_transaction_id = fields.CharField(max_length=256, null=True)
 
     users: fields.ManyToManyRelation[TelegramUser]
 
