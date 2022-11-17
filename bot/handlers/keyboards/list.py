@@ -23,7 +23,7 @@ class ListKeyboard(InlineKeyboardMarkup):
 
         for item in items[offset:offset + limit]:
             self.add(InlineKeyboardButton(
-                item[0], url=f'{config.sber_explorer_url}/address/{item[0]}'
+                item[0], callback_data='*'
             ))
 
         if offset < limit:

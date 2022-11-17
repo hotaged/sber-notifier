@@ -34,6 +34,11 @@ class RemoveAddressForm(StatesGroup):
     started = State()
 
 
+@dp.callback_query_handler(lambda x: x.data == '*')
+async def callback_query_any(callback_query: CallbackQuery):
+    return await bot.answer_callback_query(callback_query.id)
+
+
 @dp.callback_query_handler(BaseKeyboard.query_add)
 async def callback_query_add(callback_query: CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
