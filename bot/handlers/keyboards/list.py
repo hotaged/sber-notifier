@@ -16,15 +16,10 @@ BUTTON_LIST_BACK = unique_query_id()
 
 
 class ListKeyboard(InlineKeyboardMarkup):
-    def __init__(self, items: list, offset: int = 0, limit: int = 25, *args, **kwargs):
+    def __init__(self, items: list, offset: int = 0, limit: int = 5, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         docstring = f'{offset} - {offset + limit} of {len(items)}'
-
-        for item in items[offset:offset + limit]:
-            self.add(InlineKeyboardButton(
-                item[0], callback_data='*'
-            ))
 
         if offset < limit:
             previous_text = '.'
@@ -33,7 +28,7 @@ class ListKeyboard(InlineKeyboardMarkup):
             previous_text = '<'
             previous_query = f'{BUTTON_LIST}.{offset - limit}-{limit}'
 
-        if offset + limit >= len(items) - 1:
+        if offset + limit > len(items):
             next_text = '.'
             next_query = '*'
         else:

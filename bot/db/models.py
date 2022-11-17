@@ -56,18 +56,6 @@ class SberAddress(models.Model, AsListItemMixin):
 
     @classmethod
     async def from_address(cls, address: str) -> 'SberAddress':
-        async with aiohttp.ClientSession() as client:
-            request = f'{config.sber_explorer_api}/address/{address}/basic-txs?limit=1&offset=0'
-
-            async with client.get(request) as response:
-                if response.status != 200:
-                    raise cls.ValidationError(f'Sbercoin explorer responded with status: {response.status}')
-
-                json = await response.json(loads=ujson.loads)
-
-        if not json['totalCount']:
-            return await cls.create(address=address)
-
-        return await cls.create(address=address, last_transaction_id=json['transactions'][0]['id'])
+        return await cls.create(address=address)
 
 

@@ -141,10 +141,14 @@ async def callback_query_list(callback_query: CallbackQuery):
 
     user, _ = await TelegramUser.get_or_create(telegram_id=callback_query.message.chat.id)
     offset, limit = ListKeyboard.parse_callback_query(callback_query)
-    addresses = await SberAddress.as_list_items(users__in=[user])
+    addresses = await SberAddress.as_list_items(users=user)
+
+    message_text = "Список адресов: \n"
+    for address, i in addresses[offset:offset + limit]:
+        message_text += f'--- <code>{address}</code>\n'
 
     return await bot.edit_message_text(
-        BASE_MESSAGE_TEXT,
+        message_text,
 
         callback_query.message.chat.id,
         callback_query.message.message_id,
@@ -152,7 +156,9 @@ async def callback_query_list(callback_query: CallbackQuery):
 
         reply_markup=ListKeyboard(
             addresses, offset, limit
-        )
+        ),
+
+        parse_mode='HTML'
     )
 
 
