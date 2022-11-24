@@ -24,7 +24,7 @@ class BaseKeyboard(InlineKeyboardMarkup):
             "🔻 Удалить.", callback_data=BUTTON_DELETE
         ))
         self.add(InlineKeyboardButton(
-            "🗒 Лист адресов.", callback_data=f"{BUTTON_LIST}.0-5"
+            "🗒 Список адресов.", callback_data=f"{BUTTON_LIST}.0-5"
         ))
         self.add(InlineKeyboardButton(
             "🐹 Инструкция.", callback_data=BUTTON_INSTRUCTION

@@ -52,7 +52,7 @@ services:
     restart: unless-stopped
     networks:
       - shared
-    command: bash -c "aerich init -t bot.db.TORTOISE_ORM && aerich init-db && aerich upgrade && bot"
+    command: bash -c "aerich upgrade && bot"
     depends_on:
       - database
 

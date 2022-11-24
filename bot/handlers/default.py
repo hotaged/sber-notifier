@@ -1,12 +1,14 @@
+import aiohttp
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.types import Message, CallbackQuery
 
-from bot.db.models import TelegramUser, SberAddress
+from bot.db.models import TelegramUser, BlockchainAddress
 from bot.handlers.misc import dp, bot
 
 from bot.handlers.keyboards.base import BaseKeyboard
 from bot.handlers.keyboards.list import ListKeyboard
+from bot.blockchain import choice as blockchains
 
 BASE_MESSAGE_TEXT = (
     "Отслеживайте активность интересующих вас адресов в блокчейнах Bitcoin, Ethereum, Sbercoin.com, Tron, "
@@ -60,12 +62,52 @@ async def handle_address(message: Message, state: FSMContext):
             "Не хватает параметра `address`."
         )
 
+    await state.finish()
     address = address.strip()
+
+    loading_message = await bot.send_message(
+        message.chat.id,
+        f"⏳ Ищу адрес: {address}"
+    )
+
+    blockchain_found = False
+    async with aiohttp.ClientSession() as client:
+        for blockchain in blockchains:
+            loading_message = await bot.edit_message_text(
+                f"⏳ Ищу адрес: {address} на блокчейне {blockchain}",
+                message.chat.id,
+                loading_message.message_id
+            )
+            try:
+                raw_tx = await blockchains[blockchain].request_last_transaction(client, address)
+                transaction = blockchains[blockchain].parse_transaction(raw_tx)
+                chain_address, _ = await BlockchainAddress.get_or_create(address=address)
+                await chain_address.init_address(blockchain, transaction.tx_hash)
+                blockchain_found = True
+                break
+            except blockchains[blockchain].InvalidAddress:
+                continue
+
+    await bot.delete_message(
+        message.chat.id,
+        loading_message.message_id
+    )
+
+    if not blockchain_found:
+        message_text = (
+            "Не удалось загрузить данные об адресе.\n"
+            "Проверьте правильность написания адреса."
+        )
+        await bot.send_message(
+            message.chat.id,
+            message_text
+        )
+        return await any_message(message)
 
     try:
         await user.subscribe(address)
 
-    except SberAddress.ValidationError as ex:
+    except BlockchainAddress.ValidationError as ex:
         message_text = (
             "Не удалось загрузить данные об адресе.\n"
             f"Текст ошибки: {ex.message}"
@@ -76,7 +118,8 @@ async def handle_address(message: Message, state: FSMContext):
         )
 
     message_text = (
-        "Успешно добавлено."
+        "Успешно добавлено.\n"
+        f"Блокчейн: {transaction.blockchain}"
     )
 
     await bot.send_message(
@@ -85,7 +128,6 @@ async def handle_address(message: Message, state: FSMContext):
     )
 
     await any_message(message)
-    await state.finish()
 
 
 @dp.callback_query_handler(BaseKeyboard.query_delete)
@@ -141,7 +183,7 @@ async def callback_query_list(callback_query: CallbackQuery):
 
     user, _ = await TelegramUser.get_or_create(telegram_id=callback_query.message.chat.id)
     offset, limit = ListKeyboard.parse_callback_query(callback_query)
-    addresses = await SberAddress.as_list_items(users=user)
+    addresses = await BlockchainAddress.as_list_items(users=user)
 
     message_text = "Список адресов: \n"
     for address, i in addresses[offset:offset + limit]:

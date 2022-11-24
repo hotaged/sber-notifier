@@ -18,3 +18,4 @@ RUN ln -snf /usr/share/python3/app/bin/* /usr/local/bin/
 
 COPY pyproject.toml /usr/local/bin/
 ADD migrations /usr/local/bin/migrations
+WORKDIR /usr/local/bin/

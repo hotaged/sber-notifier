@@ -33,12 +33,12 @@ class EthereumBlockchain(AbstractBlockchain):
         async with client.get(request) as response:
 
             if response.status != 200:
-                raise self.InvalidAddress(f"Request failed. Trx scan responded with status code: {response.status}")
+                raise self.InvalidAddress(f"Request failed. Etherscan scan responded with status code: {response.status}")
 
             json = await response.json(loads=ujson.loads)
 
-            if json['message'] == 'NOTOK':
-                raise self.InvalidAddress(f"Address has no transactions yet")
+            if json['status'] == '0':
+                raise self.InvalidAddress(f"Address has no transactions yet", json)
 
         return json['result'][0]
 
