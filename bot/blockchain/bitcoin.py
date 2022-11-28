@@ -1,4 +1,5 @@
 import ujson
+from aiohttp import client_exceptions
 
 from aiohttp.client import ClientSession
 from bot.blockchain.base import AbstractBlockchain, Transaction
@@ -31,7 +32,10 @@ class BitcoinBlockchain(AbstractBlockchain):
             if response.status != 200:
                 raise self.InvalidAddress(f"Request failed. Bitcoin responded with status code: {response.status}")
 
-            json = await response.json(loads=ujson.loads)
+            try:
+                json = await response.json(loads=ujson.loads)
+            except client_exceptions.ContentTypeError:
+                raise self.InvalidAddress(f"Request failed. Bitcoin responded with invalid type.")
 
             if not json['data']['list']:
                 raise self.InvalidAddress(f"Address has no transactions yet")

@@ -1,13 +1,13 @@
 import aiohttp
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 
 from bot.db.models import TelegramUser, BlockchainAddress
 from bot.handlers.misc import dp, bot
 
-from bot.handlers.keyboards.base import BaseKeyboard
-from bot.handlers.keyboards.list import ListKeyboard
+from bot.handlers.keyboards.base import BaseKeyboard, BUTTON_LIST
+from bot.handlers.keyboards.list import ListKeyboard, BUTTON_LIST_AT
 from bot.blockchain import choice as blockchains
 
 BASE_MESSAGE_TEXT = (
@@ -236,3 +236,54 @@ async def callback_query_inst(callback_query: CallbackQuery):
         ))
 
     await any_message(callback_query.message)
+
+
+@dp.callback_query_handler(ListKeyboard.query_list_at)
+async def callback_query_list_at(callback_query: CallbackQuery):
+    await bot.answer_callback_query(callback_query.id)
+
+    payload = callback_query.data.split(".")
+    index, limit_offset = int(payload[1]), payload[2]
+
+    address = await BlockchainAddress.get(id=index)
+
+    message_text = (
+        f"Вы действительно желаете удалить адрес {address.chain}: {address.address}"
+    )
+
+    keyboard = InlineKeyboardMarkup()
+    keyboard.add(
+        InlineKeyboardButton(
+            "Удалить", callback_data=f'delete.{index}'
+        ),
+        InlineKeyboardButton(
+            "Назад", callback_data=f'{BUTTON_LIST}.{limit_offset}'
+        )
+    )
+
+    return await bot.edit_message_text(
+        message_text,
+
+        callback_query.message.chat.id,
+        callback_query.message.message_id,
+        callback_query.inline_message_id,
+
+        reply_markup=keyboard
+    )
+
+
+@dp.callback_query_handler(lambda x: x.data.startswith('delete'))
+async def callback_query_delete_at(callback_query: CallbackQuery):
+    await bot.answer_callback_query(callback_query.id)
+
+    user = await TelegramUser.get(telegram_id=callback_query.message.chat.id)
+    address = await BlockchainAddress.get(id=int(callback_query.data.split('.')[-1]))
+
+    await user.unsubscribe(address.address)
+
+    await bot.send_message(
+        callback_query.message.chat.id,
+        "Успешно удален!"
+    )
+
+    return await any_message(callback_query.message)

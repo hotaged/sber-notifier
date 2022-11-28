@@ -6,7 +6,6 @@ from aiogram.types import (
     CallbackQuery
 )
 
-from bot import config
 from bot.utils import unique_query_id
 from bot.handlers.keyboards.base import BUTTON_LIST
 
@@ -20,6 +19,11 @@ class ListKeyboard(InlineKeyboardMarkup):
         super().__init__(*args, **kwargs)
 
         docstring = f'{offset} - {offset + limit} of {len(items)}'
+
+        for item in items:
+            self.add(InlineKeyboardButton(
+                item[0], callback_data=f'{BUTTON_LIST_AT}.{item[1]}.{offset}-{offset + limit}'
+            ))
 
         if offset < limit:
             previous_text = '.'
